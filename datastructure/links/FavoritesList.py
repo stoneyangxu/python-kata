@@ -40,6 +40,32 @@ class FavoritesList:
             yield item._value
             walk = self._data.after(walk)
 
+    def top_count(self, k):
+        if not 1 <= k <= len(self):
+            raise ValueError("Illegal value for k")
+        walk = self._data.first()
+        for j in range(k):
+            item = walk.element()
+            yield item._count
+            walk = self._data.after(walk)
+
+    def clear(self):
+        if self.is_empty():
+            return
+        current = self._data.first()
+        while current is not None:
+            to_be_deleted = current
+            current = self._data.after(current)
+            self._data.delete(to_be_deleted)
+
+    def reset_counts(self):
+        if self.is_empty():
+            return
+        current = self._data.first()
+        while current is not None:
+            current.element()._count = 0
+            current = self._data.after(current)
+
     def _find_position(self, e):
         walk = self._data.first()
         while walk is not None and walk.element()._value != e:
@@ -58,7 +84,6 @@ class FavoritesList:
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):
-
         favorites_list = FavoritesList()
 
         self.assertEqual(True, favorites_list.is_empty())
@@ -79,9 +104,6 @@ class MyTestCase(unittest.TestCase):
         favorites_list.remove("B")
         top2 = [k for k in favorites_list.top(2)]
         self.assertEqual(['C', 'A'], top2)
-
-
-
 
 
 if __name__ == '__main__':
