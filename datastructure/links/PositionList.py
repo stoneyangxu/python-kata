@@ -148,6 +148,19 @@ class PositionList(_DoubleLinkBase):
             return cursor
         return self._find(e, self.after(cursor))
 
+    def move_to_front(self, p):
+        original = self._validate(p)
+
+        original._prev._next = original._next
+        original._next._prev = original._prev
+
+        original._prev = self._header
+        original._next = self._header._next
+
+        self._header._next = original
+
+        print(self._header._element)
+
     @staticmethod
     def insertion_sort(L):
         if len(L) > 1:
