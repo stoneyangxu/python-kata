@@ -39,10 +39,19 @@ class LinkedQueue:
             return []
         result = []
         current = self._head
-        while current is not None:
-            result.append(current._element)
-            current = current._next
+        # while current is not None:
+        #     result.append(current._element)
+        #     current = current._next
+
+        self._to_list(current, result)
+
         return result
+
+    def _to_list(self, current, result):
+        if current is None:
+            return
+        result.append(current._element)
+        self._to_list(current._next, result)
 
     def rotate(self):
         if self.is_empty():
@@ -52,6 +61,19 @@ class LinkedQueue:
         self._tail._next = current_head
         self._tail = current_head
         current_head._next = None
+
+    def concatenate(self, other_queue):
+        if not isinstance(other_queue, LinkedQueue):
+            raise TypeError("Other queue should be LinkedQueue")
+        if other_queue.is_empty():
+            return
+
+        self._size += len(other_queue)
+        self._tail._next = other_queue._head
+
+        other_queue._head = None
+        other_queue._tail = None
+        other_queue._size = 0
 
 
 class MyTestCase(unittest.TestCase):

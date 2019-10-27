@@ -57,6 +57,22 @@ class PositionList(_DoubleLinkBase):
         def __ne__(self, other):
             return not (self == other)
 
+    class PositionIterator:
+        def __init__(self, position_list):
+            self._position_list = position_list
+            self._current = position_list.first()
+
+        def __next__(self):
+            if self._current is not None:
+                answer = self._current.element()
+                self._current = self._position_list.after(self._current)
+                return answer
+            else:
+                raise StopIteration()
+
+        def __iter__(self):
+            return self
+
     def _validate(self, p):
         if not isinstance(p, self.Position):
             raise TypeError("p must be proper Position type")
@@ -87,10 +103,11 @@ class PositionList(_DoubleLinkBase):
         return self._make_position(node._next)
 
     def __iter__(self):
-        cursor = self.first()
-        while cursor is not None:
-            yield cursor.element()
-            cursor = self.after(cursor)
+        # cursor = self.first()
+        # while cursor is not None:
+        #     yield cursor.element()
+        #     cursor = self.after(cursor)
+        return self.PositionIterator(self)
 
     def __reversed__(self):
         cursor = self.last()
@@ -119,6 +136,18 @@ class PositionList(_DoubleLinkBase):
     def delete(self, p):
         original = self._validate(p)
         return self._delete_node(original)
+
+    def keep(self, n):
+        if len(self) < n:
+            return
+        p = self.first()
+        for i in range(n):
+            p = self.after(p)
+
+        original = self._validate(p)
+        original._next = self._tailer
+        self._tailer._prev = original
+        self._size = n
 
     def replace(self, p, e):
         original = self._validate(p)
@@ -160,6 +189,46 @@ class PositionList(_DoubleLinkBase):
         self._header._next = original
 
         print(self._header._element)
+
+    def swap(self, p, q):
+        original_p = self._validate(p)
+        original_q = self._validate(q)
+
+        prev_p = original_p._prev
+        next_p = original_p._next
+
+        prev_q = original_q._prev
+        next_q = original_q._next
+
+        prev_p._next = original_q
+        original_q._prev = prev_p
+        next_p._prev = original_q
+        original_q._next = next_p
+
+        prev_q._next = original_p
+        original_p._prev = prev_q
+        next_q._prev = original_p
+        original_p._next = next_q
+
+    def shuffle(self):
+        if self.is_empty():
+            return
+        cursor = self.first()
+        move_cursor = cursor
+
+        half_len = (self._size + 1) // 2
+        for i in range(half_len):
+            move_cursor = self.after(move_cursor)
+
+        while (cursor is not None) and (move_cursor is not None):
+            next_cursor = self.after(cursor)
+            next_move_cursor = self.after(move_cursor)
+
+            e = self.delete(move_cursor)
+            self.add_after(cursor, e)
+
+            cursor = next_cursor
+            move_cursor = next_move_cursor
 
     @staticmethod
     def insertion_sort(L):

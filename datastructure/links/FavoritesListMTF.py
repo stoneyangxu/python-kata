@@ -26,6 +26,9 @@ class FavoritesListMTF(FavoritesList):
         if p != self._data.first():
             self._data.add_first(self._data.delete(p))
 
+    def keeps(self, n):
+        self._data.keep(n)
+
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):

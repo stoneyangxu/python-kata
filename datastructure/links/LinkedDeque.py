@@ -21,6 +21,19 @@ class _DoubleLinkBase:
     def __len__(self):
         return self._size
 
+    def __reversed__(self):
+        current = self._header
+        while current is not None:
+            prev = current._prev
+            next = current._next
+
+            current._prev = next
+            current._next = prev
+
+            current = next
+
+        self._header, self._tailer = self._tailer, self._header
+
     def is_empty(self):
         return self._size == 0
 
